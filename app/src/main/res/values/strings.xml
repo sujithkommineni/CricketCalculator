@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">CricketCalculator</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="continue_prev_game">Continue previous game</string>
+    <string name="new_game">New Game</string>
+    <string name="str_game_name">Game name</string>
+    <string name="str_side1_batsfirst">Side 1 (bats first)</string>
+    <string name="str_side1">Side 1</string>
+    <string name="str_side2">Side 2</string>
+    <string name="str_start">Start</string>
+    <string name="str_game_prefix">Game</string>
+    <string name="str_name">Name</string>
+    <string name="str_score">Score</string>
+    <string name="str_overs">Overs</string>
+    <string name="str_wickets">Wickts</string>
+
+</resources>
