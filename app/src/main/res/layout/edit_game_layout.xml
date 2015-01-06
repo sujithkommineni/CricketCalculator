@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+<LinearLayout
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:padding="12dp">
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -12,98 +17,228 @@
     <EditText
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/edit_game_name" />
+        android:id="@+id/edit_game_name"
+        android:layout_marginTop="3dp"/>
 
     <Space
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="20dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
         android:text="@string/str_side1"
         android:id="@+id/textView" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"/>
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/str_name"
             android:id="@+id/tv_name"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true" />
+            android:layout_centerVertical="true"/>
 
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/editText"
+            android:id="@+id/edit_side1"
+            android:layout_marginLeft="3dp"
             android:layout_alignParentRight="true"
             android:singleLine="true"
             android:layout_toRightOf="@id/tv_name" />
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/str_score"
             android:id="@+id/tv_edit_score1"
+            android:layout_centerVertical="true"
             />
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/tv_edit_score1"
             android:layout_alignParentRight="true"
+            android:layout_marginLeft="3dp"
             android:inputType="number"
+            android:id="@+id/edit_score1"
             android:singleLine="true"/>
     </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/str_overs"
             android:id="@+id/tv_edit_overs1"
+            android:layout_centerVertical="true"
             />
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/tv_edit_overs1"
+            android:layout_marginLeft="3dp"
             android:singleLine="true"
             android:maxEms="3"
+            android:inputType="number"
             android:id="@+id/edit_overs1"
             />
         <Spinner
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
-            android:layout_toRightOf="@id/edit_overs1">
+            android:layout_toRightOf="@id/edit_overs1"
+            android:layout_centerVertical="true"
+            android:id="@+id/spinner_balls1">
             </Spinner>
         </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
         >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/tv_edit_wkts1"
-            android:text="@string/str_wickets"/>
+            android:text="@string/str_wickets"
+            android:layout_centerVertical="true"/>
         <EditText
-            android:layout_width="wrap_content"
+            android:layout_width="60dp"
             android:layout_height="wrap_content"
             android:maxEms="3"
+            android:layout_marginLeft="3dp"
             android:id="@+id/edit_wkts1"
             android:singleLine="true"
             android:inputType="number"
             android:layout_toRightOf="@id/tv_edit_wkts1"/>
         </RelativeLayout>
 
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="20dp" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="@android:style/TextAppearance.DeviceDefault.Medium"
+        android:text="@string/str_side2"
+        android:id="@+id/tv_side2" />
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="@android:color/darker_gray"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_name"
+            android:id="@+id/tv_name1"
+            android:layout_centerVertical="true"/>
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/edit_side2"
+            android:layout_marginLeft="3dp"
+            android:layout_alignParentRight="true"
+            android:singleLine="true"
+            android:layout_toRightOf="@id/tv_name1" />
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_score"
+            android:id="@+id/tv_edit_score2"
+            android:layout_centerVertical="true"
+            />
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_edit_score2"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="3dp"
+            android:inputType="number"
+            android:id="@+id/edit_score2"
+            android:singleLine="true"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/str_overs"
+            android:id="@+id/tv_edit_overs2"
+            android:layout_centerVertical="true"
+            />
+        <EditText
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_edit_overs2"
+            android:layout_marginLeft="3dp"
+            android:singleLine="true"
+            android:maxEms="3"
+            android:inputType="number"
+            android:id="@+id/edit_overs2"
+            />
+        <Spinner
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/edit_overs2"
+            android:layout_centerVertical="true"
+            android:id="@+id/spinner_balls2">
+        </Spinner>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="3dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_edit_wkts2"
+            android:text="@string/str_wickets"
+            android:layout_centerVertical="true"/>
+        <EditText
+            android:layout_width="60dp"
+            android:layout_height="wrap_content"
+            android:maxEms="3"
+            android:layout_marginLeft="3dp"
+            android:id="@+id/edit_wkts2"
+            android:singleLine="true"
+            android:inputType="number"
+            android:layout_toRightOf="@id/tv_edit_wkts2"/>
+    </RelativeLayout>
+
 </LinearLayout>
+    </ScrollView>
