@@ -1,6 +1,7 @@
 package com.hydapps.cricketcalc.ui;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +11,9 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.db.GamesDb;
+import com.hydapps.cricketcalc.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -18,14 +21,15 @@ import java.util.ArrayList;
 /**
  * Created by HRGN76 on 12/22/2014.
  */
-public class GamesListActivity extends Activity {
+public class GamesListActivity extends Activity implements GameListAdapter.OnEditClickListener{
 
-    private ArrayList<MatchDetails> mMatchDetailsList;
+    private ArrayList<GameDetails> mMatchDetailsList;
     private Handler mUpdateHandler;
     private static final int INVALIDATE_LIST = 1;
 
     private RecyclerView mRecyclerView;
     private GameListAdapter mAdapter;
+    private static final int REQ_EDIT_GAME = 1;
 
 
     @Override
@@ -52,19 +56,19 @@ public class GamesListActivity extends Activity {
                 mMatchDetailsList.clear();
                 if (cursor != null && cursor.moveToFirst()) {
                     do {
-                        MatchDetails match = new MatchDetails();
-                        match.mGameName = cursor.getString(0);
-                        match.mTime = cursor.getString(1);
-                        match.mSide1 = cursor.getString(2);
-                        match.mSide2 = cursor.getString(3);
-                        match.mSide1Score = cursor.getInt(4);
-                        match.mSide1Wkts = cursor.getInt(5);
-                        match.mSide1BallsPlayed = cursor.getInt(6);
-                        match.mSide2Score = cursor.getInt(7);
-                        match.mSide2Wkts = cursor.getInt(8);
-                        match.mSide2BallsPlayed = cursor.getInt(9);
-                        match.mGameState = cursor.getInt(10);
-                        match.mNote = cursor.getString(11);
+                        GameDetails match = new GameDetails();
+                        match.setGameName(cursor.getString(0));
+                        match.setStartTime(cursor.getLong(1));
+                        match.setSide1(cursor.getString(2));
+                        match.setSide2(cursor.getString(3));
+                        match.setScore1(cursor.getInt(4));
+                        match.setWickets1(cursor.getInt(5));
+                        match.setBalls1(cursor.getInt(6));
+                        match.setScore2(cursor.getInt(7));
+                        match.setWickets2(cursor.getInt(8));
+                        match.setBalls2(cursor.getInt(9));
+                        match.setGameSate(cursor.getInt(10));
+                        match.setNote(cursor.getString(11));
                         mMatchDetailsList.add(match);
                     } while(cursor.moveToNext());
                 }
@@ -74,6 +78,21 @@ public class GamesListActivity extends Activity {
                 }
             }
         });
+    }
+
+    @Override
+    public void onEditClick(int position) {
+        GameDetails game = mMatchDetailsList.get(position);
+        Intent editIntent = new Intent(this, EditGameActivity.class);
+        editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, game);
+        startActivityForResult(editIntent, REQ_EDIT_GAME);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQ_EDIT_GAME && resultCode == RESULT_OK) {
+
+        }
     }
 
     private class UpdateHandler extends Handler {

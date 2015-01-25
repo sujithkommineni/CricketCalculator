@@ -72,4 +72,28 @@ public class GamesDb {
         Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME);
         return c;
     }
+
+    public static GameDetails getLatestGame(Context context) {
+        DBHelper helper = new DBHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME, String.valueOf(1));
+        GameDetails game = null;
+        if (c != null && c.moveToFirst()) {
+            game = new GameDetails();
+            game.setGameName(c.getString(0));
+            game.setStartTime(c.getLong(1));
+            game.setSide1(c.getString(2));
+            game.setSide2(c.getString(3));
+            game.setScore1(c.getInt(4));
+            game.setWickets1(c.getInt(5));
+            game.setBalls1(c.getInt(6));
+            game.setScore2(c.getInt(7));
+            game.setWickets2(c.getInt(8));
+            game.setBalls2(c.getInt(9));
+            game.setGameSate(c.getInt(10));
+            game.setNote(c.getString(11));
+        }
+        if (c != null) c.close();
+        return game;
+    }
 }

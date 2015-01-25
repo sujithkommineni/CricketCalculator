@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.utils.Utils;
 
 import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
 
@@ -52,7 +53,7 @@ public class EditGameActivity extends ActionBarActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case RESULT_SAVE:
-                Intent i = getIntent().putExtras(mEditFragment.getEditedGameDetails());
+                Intent i = getIntent().putExtra(Utils.EXTRA_GAME_DETAILS, mEditFragment.getEditedGameDetails());
                 setResult(RESULT_OK, i);
                 finish();
                 return true;

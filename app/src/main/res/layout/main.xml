@@ -4,7 +4,14 @@
     android:layout_width = "fill_parent"
     android:layout_height = "fill_parent"
     >
-<LinearLayout
+    <fragment
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:name="com.hydapps.cricketcalc.ui.AdFragment"
+        android:id="@+id/adfragment"></fragment>
+
+
+    <LinearLayout
     android:orientation = "horizontal"
     android:layout_width = "fill_parent"
     android:layout_height = "50dp"
@@ -49,7 +56,7 @@
 	android:paddingLeft = "15dp"
 	android:textSize = "15dp"
 	android:textColor = "@android:color/white"
-	android:text = "@string/runs"
+	android:text = "@string/str_score"
 	/>
 <TextView
 	android:layout_width = "fill_parent"
@@ -75,7 +82,7 @@
 	android:paddingLeft = "15dp"
 	android:textSize = "15dp"
 	android:textColor = "@android:color/white"
-	android:text = "@string/overs"
+	android:text = "@string/str_overs"
 	/>
 <TextView
 	android:layout_width = "fill_parent"

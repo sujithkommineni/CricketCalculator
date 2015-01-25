@@ -11,8 +11,10 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.db.GamesDb;
 import com.hydapps.cricketcalc.utils.DateUtils;
+import com.hydapps.cricketcalc.utils.Utils;
 
 import java.util.Date;
 
@@ -66,8 +68,12 @@ public class NewGameEditActivity extends ActionBarActivity implements View.OnCli
                 GamesDb.insertNewGame(NewGameEditActivity.this, mGameNameString, mSide1Str, mSide2Str);
             }
         });
-        // TODO start scorer activity and finish this.
-        Intent intent = new Intent(this, GamesListActivity.class);
+        GameDetails game = new GameDetails();
+        game.setGameName(mGameNameString);
+        game.setSide1(mSide1Str);
+        game.setSide2(mSide2Str);
+        Intent intent = new Intent(this, ScoreBoardActivity.class);
+        intent.putExtra(Utils.EXTRA_GAME_DETAILS, game);
         startActivity(intent);
     }
 }

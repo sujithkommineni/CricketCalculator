@@ -16,6 +16,12 @@
     <string name="str_score">Score</string>
     <string name="str_overs">Overs</string>
     <string name="str_wickets">Wickets</string>
+    <string name="str_savedgames">Saved games</string>
+    <string name="str_result_sideWon">won by %s</string>
+    <string name="str_result_inprogress">In progress</string>
+    <string name="str_result_draw">Draw</string>
+
+    <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
     <string-array name="balls_array">
         <item>0</item>

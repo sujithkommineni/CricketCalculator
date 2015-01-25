@@ -1,11 +1,12 @@
 package com.hydapps.cricketcalc.ui;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,31 +19,28 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.db.GameDetails;
+import com.hydapps.cricketcalc.utils.Utils;
 
-public class ScoreBoardActivity extends Activity implements View.OnClickListener {
+public class ScoreBoardActivity extends ActionBarActivity implements View.OnClickListener {
     /** Called when the activity is first created. */
 	
 	private final String TAG = "CRICKET_CALC";
 	
 	//keys to save in bundle
-	private static final String NO_OF_BALLS = "no_of_balls";//no of balls including same balls in the current over
-	public static final String TOTAL_BALLS = "total_no_of_balls";//total balls in the match so far
-	public static final String TOTAL_RUNS = "total_runs";
-	public static final String TOTAL_WICKETS = "total_wickets";
+	private static final String NO_OF_BALLS = "no_of_balls";//no of mBalls including same mBalls in the current over
 	
-	//holder to place the balls
-	private LinearLayout holder;
-	private TextView ball;
-	private TextView score_view, overs_view;
-	private HorizontalScrollView scrollBall;
-	private Animation animation;
-	private Button button_sameball;
+	//mBallHolder to place the mBalls
+	private LinearLayout mBallHolder;
+	private TextView mBall;
+	private TextView mScoreView, mOversView;
+	private HorizontalScrollView mScrollbar;
+	private Animation mAnimation;
+	private Button mButtonSameBall;
 	
-	private int score = 0;
-	private int wickets = 0;
-	private int balls = 0;
-	private boolean same_ball = false;
-	
+	private boolean mSameBall = false;
+    private GameDetails mGameDetails;
+
 	public static final int WICKET = 10;
 	public static final int NO_WICKET = 11;
 	public static final int CORRECT_BALL = 9;
@@ -52,15 +50,18 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
 	public static final int RESULT_WHAT = 12;
 	public static final int RESULT_RUNS = 13;
 	public static final int RESULT_WICKET = 14;
-	
+    private int mScore;
+    private int mBalls;
+    private int mWickets;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         Window win = getWindow();
         win.setBackgroundDrawableResource(R.drawable.grass_tile_repeat);
-        button_sameball = (Button)findViewById(R.id.button_sameball);
-        button_sameball.setOnClickListener(this);
+        mButtonSameBall = (Button)findViewById(R.id.button_sameball);
+        mButtonSameBall.setOnClickListener(this);
         findViewById(R.id.button_undo).setOnClickListener(this);
         findViewById(R.id.button_dotball).setOnClickListener(this);
         findViewById(R.id.button_one).setOnClickListener(this);
@@ -71,12 +72,17 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
         findViewById(R.id.button_wicket).setOnClickListener(this);
         findViewById(R.id.button_wide).setOnClickListener(this);
         findViewById(R.id.button_nobe).setOnClickListener(this);
-        score_view = (TextView)findViewById(R.id.tv_score);
-        overs_view = (TextView)findViewById(R.id.tv_overs);
-        holder = (LinearLayout)findViewById(R.id.ll_ballholder);
-        animation = AnimationUtils.makeInAnimation(this, false);
-        scrollBall = (HorizontalScrollView)findViewById(R.id.horizontal_scroll);
-        if(savedInstanceState != null)
+        mScoreView = (TextView)findViewById(R.id.tv_score);
+        mOversView = (TextView)findViewById(R.id.tv_overs);
+        mBallHolder = (LinearLayout)findViewById(R.id.ll_ballholder);
+        mAnimation = AnimationUtils.makeInAnimation(this, false);
+        mScrollbar = (HorizontalScrollView)findViewById(R.id.horizontal_scroll);
+        Intent intent = getIntent();
+        if (savedInstanceState != null) {
+            mGameDetails = savedInstanceState.getParcelable(Utils.EXTRA_GAME_DETAILS);
+        } else if (intent != null) {
+            mGameDetails = intent.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
+        }
         recoverPreviousState(savedInstanceState);
         updateScore();
     }
@@ -84,29 +90,61 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
     
     private void recoverPreviousState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-    	score = savedInstanceState.getInt(TOTAL_RUNS, 0);
-    	balls = savedInstanceState.getInt(TOTAL_BALLS, 0);
-    	wickets = savedInstanceState.getInt(TOTAL_WICKETS, 0);
-    	int no_ballViews = savedInstanceState.getInt(NO_OF_BALLS,-1);
-    	for(int i=1; i<=no_ballViews && i!=-1; i++){
-    		String s = savedInstanceState.getString("ball"+i);
-    		addRecoveredViews(s);
-    	}
-    	adjustScroll();
+        GameDetails gameDetails = mGameDetails;
+        if (gameDetails.getGameSate() == GameDetails.STATE_SIDE1_BATTING) {
+            mScore = gameDetails.getScore1();
+            mBalls = gameDetails.getBalls1();
+            mWickets = gameDetails.getWickets1();
+        } else if (gameDetails.getGameSate() == GameDetails.STATE_SIDE2_BATTING) {
+            mScore = gameDetails.getScore2();
+            mBalls = gameDetails.getBalls2();
+            mWickets = gameDetails.getWickets2();
+        } else {
+            throw new IllegalStateException("no team is batting");
+        }
+        if (savedInstanceState != null) {
+            int no_ballViews = savedInstanceState.getInt(NO_OF_BALLS,-1);
+            for(int i=1; i<=no_ballViews && no_ballViews != -1; i++){
+                String s = savedInstanceState.getString("mBall"+i);
+                addRecoveredViews(s);
+            }
+            adjustScroll();
+        }
 	}
 
 
 	private void addRecoveredViews(String s) {
 		// TODO Auto-generated method stub
-		ball = (TextView)View.inflate(this, R.layout.ball, null);
-		ball.setTag(s);
-		ball.setText(s);
-		if(s.startsWith("+"))
-			s = s.substring(1);
-		else
-			ball.setBackgroundResource(R.drawable.ball_transback);
-		holder.addView(ball);
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+        mBall = (TextView)inflater.inflate(R.layout.ball, mBallHolder, false);
+		mBall.setTag(s);
+		if(s.startsWith("+")) {
+            mBall.setText(getTextForballType(Integer.parseInt(s.substring(1))));
+        } else {
+            mBall.setBackgroundResource(R.drawable.ball_transback);
+            mBall.setText(getTextForballType(Integer.parseInt(s)));
+        }
+		mBallHolder.addView(mBall);
 	}
+
+    private String getTextForballType(int ball_type) {
+        String ret = null;
+        switch (ball_type) {
+            case NO_BALL:
+                ret = "NB";
+                break;
+            case WIDE_BALL:
+                ret = "WD";
+                break;
+            case WICKET:
+                ret = "WK";
+                break;
+            default:
+                ret = String.valueOf(ball_type);
+                break;
+        }
+        return ret;
+    }
 
 
 	public void onClick(View v){
@@ -116,11 +154,11 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
     	audio_manager.playSoundEffect(AudioManager.FX_KEYPRESS_STANDARD);
     	
     	if(v.getId() == R.id.button_undo){
-    		final int no_balls = holder.getChildCount();
+    		final int no_balls = mBallHolder.getChildCount();
     		if(no_balls != 0){
-    			String s = (String)holder.getChildAt(no_balls-1).getTag();
+    			String s = (String) mBallHolder.getChildAt(no_balls-1).getTag();
     			processAndUpdateTag(s);
-    			holder.removeViewAt(no_balls-1);
+    			mBallHolder.removeViewAt(no_balls - 1);
     			adjustScroll();
     			updateScore();
     		}
@@ -128,84 +166,84 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
     	}
     	
     	if(v.getId() == R.id.button_sameball){
-    		same_ball = same_ball? false: true;
-    		button_sameball.setSelected(same_ball);
+    		mSameBall = !mSameBall;
+    		mButtonSameBall.setSelected(mSameBall);
     		return;
     	}
     	
     	
     	switch (v.getId()) {
     	case R.id.button_dotball:
-    		process(0, "0", same_ball);
+    		process(0, "0", mSameBall);
     		break;
     	
 		case R.id.button_one:
-			process(1,"1",same_ball);
-			score++;
+			process(1,"1", mSameBall);
+			mScore++;
 			break;
 			
 		case R.id.button_two:
-			process(2,"2",same_ball);
-			score+=2;
+			process(2,"2", mSameBall);
+			mScore +=2;
 			break;
 			
 		case R.id.button_three:
-			process(3,"3",same_ball);
-			score+=3;
+			process(3,"3", mSameBall);
+			mScore +=3;
 			break;
 
 		case R.id.button_four:
-			process(4,"4",same_ball);
-			score+=4;
+			process(4,"4", mSameBall);
+			mScore +=4;
 			break;
 			
 		case R.id.button_six:
-			process(6,"6",same_ball);
-			score+=6;
+			process(6,"6", mSameBall);
+			mScore +=6;
 			break;
 			
 		case R.id.button_wicket:
-			process(WICKET,"WK",same_ball);
-			wickets++;
+			process(WICKET,getTextForballType(WICKET), mSameBall);
+			mWickets++;
 			break;
 			
 		case R.id.button_wide:
-			process(WIDE_BALL, "WD", same_ball);
-			score++;
+			process(WIDE_BALL, getTextForballType(WIDE_BALL), mSameBall);
+			mScore++;
 			break;
 			
 		case R.id.button_nobe:
-			process(NO_BALL, "NB", same_ball);
-			score++;
+			process(NO_BALL, getTextForballType(NO_BALL), mSameBall);
+			mScore++;
 			break;
 			
 		default:
 			break;
 		}
     	
-    	if(!same_ball && v.getId()!=R.id.button_nobe && v.getId()!=R.id.button_wide)
-    		balls++;
-    	same_ball = false;
-    	button_sameball.setSelected(same_ball);
+    	if(!mSameBall && v.getId()!=R.id.button_nobe && v.getId()!=R.id.button_wide)
+    		mBalls++;
+    	mSameBall = false;
+    	mButtonSameBall.setSelected(mSameBall);
     	updateScore();
     }
     
 	//Moves the Scroll to the Right End
 	private void adjustScroll() {
 		// TODO Auto-generated method stub
-		scrollBall.post(new Runnable(){
+		mScrollbar.post(new Runnable() {
 
- 			@Override
- 			public void run() {
- 				// TODO Auto-generated method stub
- 				scrollBall.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
- 			}
- 			
- 		});
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                mScrollbar.fullScroll(HorizontalScrollView.FOCUS_RIGHT);
+            }
+
+        });
 	}
 
 
-	//understands the tag. if it starts with '+' that means that is the same ball, so it reduces the score but not the balls.
+	//understands the tag. if it starts with '+' that means that is the same mBall, so it reduces the mScore but not the mBalls.
     private void processAndUpdateTag(String s) {
 		// TODO Auto-generated method stub
     	Log.i(TAG, "tag: "+s);
@@ -217,67 +255,73 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
     	}
     	int tag = Integer.parseInt(s);
     	if(tag==NO_BALL || tag==WIDE_BALL){
-    		score--;
+    		mScore--;
     		return;
     	}
     	if(tag == WICKET){
-    		wickets--;
+    		mWickets--;
     		if(!sameball)
-    			balls--;
+    			mBalls--;
     		return;
     	}
-    	score-=tag;
+    	mScore -=tag;
 		if(!sameball)
-			balls--;
+			mBalls--;
 	}
 
 
 	/*
      * process the button clicks. 
-     * adds '+' to the string Tag if it is same ball. these tags are stored as bundle in onSaveInstanceState();
-     * While reading those string if there is '+' in the string we wont set ball background to that view.
+     * adds '+' to the string Tag if it is same mBall. these tags are stored as bundle in onSaveInstanceState();
+     * While reading those string if there is '+' in the string we wont set mBall background to that view.
      */
     private void process(int result,String text, boolean sameball){
-    	Log.i(TAG, "balls: "+balls);
-    	if(balls % 6 == 0 && !sameball){
-    		holder.removeAllViews();
+    	Log.i(TAG, "mBalls: "+ mBalls);
+    	if(mBalls % 6 == 0 && !sameball){
+    		mBallHolder.removeAllViews();
     	}
-    	ball = (TextView)View.inflate(this, R.layout.ball, null);
-		if(sameball){
+        LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
+    	mBall = (TextView)inflater.inflate(R.layout.ball, mBallHolder, false);
+		if (sameball) {
 			text = "+"+text;
-			ball.setTag("+"+result);
-		}else{
-			ball.setTag(""+result);
-			ball.setBackgroundResource(R.drawable.ball_transback);
+			mBall.setTag("+"+result);
+		} else {
+			mBall.setTag(""+result);
+			mBall.setBackgroundResource(R.drawable.ball_transback);
 		}
-		ball.setText(text);
-		holder.addView(ball);
-		ball.startAnimation(animation);
+		mBall.setText(text);
+		mBallHolder.addView(mBall);
+		mBall.startAnimation(mAnimation);
 		adjustScroll();
     }
     
-    //updates the score and overs
+    //updates the mScore and overs
     private void updateScore(){
-    	score_view.setText(""+score+"/"+wickets);
-    	overs_view.setText(""+balls/6+"."+balls%6);
+    	mScoreView.setText("" + mScore + "/" + mWickets);
+    	mOversView.setText("" + mBalls / 6 + "." + mBalls % 6);
     }
     
     @Override
 	protected void onSaveInstanceState(Bundle outState) {
 		// TODO Auto-generated method stub
     	Log.i(TAG, "savedinstacestare() called");
-    	int no_of_balls = holder.getChildCount();
-    	outState.putInt(TOTAL_RUNS, score);
-    	outState.putInt(TOTAL_BALLS, balls);
-    	outState.putInt(TOTAL_WICKETS, wickets);
+    	int no_of_balls = mBallHolder.getChildCount();
+        writeToGameDetails();
+        outState.putParcelable(Utils.EXTRA_GAME_DETAILS, mGameDetails);
     	outState.putInt(NO_OF_BALLS, no_of_balls);
     	for(int i=1; i<=no_of_balls; i++){
-    		String s = (String)holder.getChildAt(i-1).getTag();
-    		outState.putString("ball"+i, s);
-    		Log.i(TAG, "saving ball "+ i+" as "+s);
+    		String s = (String) mBallHolder.getChildAt(i-1).getTag();
+    		outState.putString("mBall"+i, s);
+    		Log.i(TAG, "saving mBall "+ i+" as "+s);
     	}
 		super.onSaveInstanceState(outState);
 	}
+
+    private void writeToGameDetails() {
+        mGameDetails.updateBattingTeamScore(mScore);
+        mGameDetails.updateBattingTeamBallsPlayed(mBalls);
+        mGameDetails.updateBattingTeamWickets(mWickets);
+    }
 
 
 	@Override
@@ -293,41 +337,51 @@ public class ScoreBoardActivity extends Activity implements View.OnClickListener
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
 		if(item.getTitle().equals("RESET")){
-			holder.removeAllViews();
-			score = 0;
-			balls = 0;
-			wickets = 0;
+			mBallHolder.removeAllViews();
+			mScore = 0;
+			mBalls = 0;
+			mWickets = 0;
 			updateScore();
 			adjustScroll();
 		}
 		if(item.getTitle().equals("EDIT")){
 			Intent editIntent = new Intent(this, EditGameActivity.class);
-			editIntent.putExtra(TOTAL_BALLS, balls);
-			editIntent.putExtra(TOTAL_RUNS, score);
-			editIntent.putExtra(TOTAL_WICKETS, wickets);
+            writeToGameDetails();
+            editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, mGameDetails);
 			startActivityForResult(editIntent, 1);
 		}
 		return true;
 	}
-	
-	@Override
-	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		// TODO Auto-generated method stub
-		if(resultCode == RESULT_OK){
-		int new_balls = data.getIntExtra(TOTAL_BALLS, balls);
-		wickets = data.getIntExtra(TOTAL_WICKETS, wickets);
-		score = data.getIntExtra(TOTAL_RUNS, score);
-		if(new_balls != balls){
-			holder.removeAllViews();
-			for(int i=0; i<new_balls%6; i++){
-				addRecoveredViews("0");
-			}
-			adjustScroll();
-		}
-		balls = new_balls;
-		updateScore();
-		}
-	}
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // TODO Auto-generated method stub
+        int new_balls;
+        if (resultCode == RESULT_OK) {
+            mGameDetails = data.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
+            if (mGameDetails.getGameSate() == GameDetails.STATE_SIDE1_BATTING) {
+                mScore = mGameDetails.getScore1();
+                new_balls = mGameDetails.getBalls1();
+                mWickets = mGameDetails.getWickets1();
+            } else if (mGameDetails.getGameSate() == GameDetails.STATE_SIDE2_BATTING) {
+                mScore = mGameDetails.getScore2();
+                new_balls = mGameDetails.getBalls2();
+                mWickets = mGameDetails.getWickets2();
+            } else {
+                throw new IllegalStateException("no team is batting");
+            }
+
+            if (new_balls != mBalls) {
+                mBallHolder.removeAllViews();
+                for (int i = 0; i < new_balls % 6; i++) {
+                    addRecoveredViews("0");
+                }
+                adjustScroll();
+            }
+            mBalls = new_balls;
+            updateScore();
+        }
+    }
 
 
 		

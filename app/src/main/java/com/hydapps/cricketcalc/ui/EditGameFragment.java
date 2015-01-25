@@ -13,7 +13,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.DateUtils;
+import com.hydapps.cricketcalc.utils.Utils;
 
 import java.util.Date;
 
@@ -25,19 +27,6 @@ public class EditGameFragment extends Fragment {
     private EditText mEditGameName, mEditSide1, mEditScore1, mEditOvers1, mEditWickets1,
                           mEditSide2, mEditScore2, mEditOvers2, mEditWickets2;
     private Spinner mSpinnerBalls1, mSpinnerBalls2;
-
-    private String mGameName, mSide1, mSide2;
-    private int mScore1, mScore2, mBalls1, mBalls2, mWickets1, mWickets2;
-
-    private static final String TAG_GAME = "TAG_GAME";
-    private static final String TAG_SIDE1 = "TAG_SIDE1";
-    private static final String TAG_SCORE1 = "TAG_SCORE1";
-    private static final String TAG_BALLS1 = "TAG_BALLS1";
-    private static final String TAG_WICKETS1 = "TAG_WICKETS1";
-    private static final String TAG_SIDE2 = "TAG_SIDE2";
-    private static final String TAG_SCORE2 = "TAG_SCORE2";
-    private static final String TAG_BALLS2 = "TAG_BALLS2";
-    private static final String TAG_WICKETS2 = "TAG_WICKETS2";
 
     private static final String LOG_TAG = "EditGameFragment";
 
@@ -70,24 +59,16 @@ public class EditGameFragment extends Fragment {
 
         Bundle b = getArguments();
         if (b != null) {
-            mGameName = b.getString(TAG_GAME);
-            mSide1 = b.getString(TAG_SIDE1);
-            mSide2 = b.getString(TAG_SIDE2);
-            mScore1 = b.getInt(TAG_SCORE1);
-            mScore2 = b.getInt(TAG_SCORE2);
-            mBalls1 = b.getInt(TAG_BALLS1);
-            mBalls2 = b.getInt(TAG_BALLS2);
-            mWickets1 = b.getInt(TAG_WICKETS1);
-            mWickets2 = b.getInt(TAG_WICKETS2);
+            GameDetails game = b.getParcelable(Utils.EXTRA_GAME_DETAILS);
 
-            mEditGameName.setText(b.getString(TAG_GAME));
-            mEditSide1.setText(b.getString(TAG_SIDE1));
-            mEditSide2.setText(b.getString(TAG_SIDE2));
-            mEditScore1.setText(b.getString(TAG_SCORE1));
-            mEditScore2.setText(b.getString(TAG_SCORE2));
-            mEditWickets1.setText(b.getString(TAG_WICKETS1));
-            mEditWickets2.setText(b.getString(TAG_WICKETS2));
-            int balls = b.getInt(TAG_BALLS1);
+            mEditGameName.setText(game.getGameName());
+            mEditSide1.setText(game.getSide1());
+            mEditSide2.setText(game.getSide2());
+            mEditScore1.setText(game.getScore1());
+            mEditScore2.setText(game.getScore2());
+            mEditWickets1.setText(game.getWickets1());
+            mEditWickets2.setText(game.getWickets2());
+            int balls = game.getBalls1();
             if (balls > 0) {
                 mEditOvers1.setText(String.valueOf((int) balls/6));
                 mSpinnerBalls1.setSelection((int) balls % 6);
@@ -95,7 +76,7 @@ public class EditGameFragment extends Fragment {
                 mEditOvers1.setText(String.valueOf(0));
                 mSpinnerBalls1.setSelection(0);
             }
-            balls = b.getInt(TAG_BALLS2);
+            balls = game.getBalls2();
             if (balls > 0) {
                 mEditOvers2.setText(String.valueOf((int) balls/6));
                 mSpinnerBalls2.setSelection((int) balls % 6);
@@ -107,7 +88,7 @@ public class EditGameFragment extends Fragment {
         return v;
     }
 
-    public Bundle getEditedGameDetails() {
+    public GameDetails getEditedGameDetails() {
         String gameName = null;
         if (TextUtils.isEmpty(gameName = mEditGameName.getText().toString())) {
             Date d = new Date();
@@ -153,17 +134,8 @@ public class EditGameFragment extends Fragment {
         balls2 += Integer.parseInt((String) mSpinnerBalls2.getSelectedItem());
 
 
-        Bundle b = new Bundle();
-        b.putString(TAG_GAME, gameName);
-        b.putString(TAG_SIDE1, side1);
-        b.putString(TAG_SIDE2, side2);
-        b.putInt(TAG_SCORE1, score1);
-        b.putInt(TAG_SCORE2, score2);
-        b.putInt(TAG_BALLS1, balls1);
-        b.putInt(TAG_BALLS2, balls2);
-        b.putInt(TAG_WICKETS1, wickets1);
-        b.putInt(TAG_WICKETS2, wickets2);
-        Log.v(LOG_TAG, "getEditedGameDetails: " + b.toString());
-        return b;
+        GameDetails game = new GameDetails(gameName, side1, side2, score1, score2, balls1, balls2, wickets1, wickets2);
+        Log.v(LOG_TAG, "getEditedGameDetails: " + game);
+        return game;
     }
 }
