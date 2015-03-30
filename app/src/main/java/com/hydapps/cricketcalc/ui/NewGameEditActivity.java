@@ -1,9 +1,12 @@
 package com.hydapps.cricketcalc.ui;
 
 import android.app.Activity;
+import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -62,16 +65,31 @@ public class NewGameEditActivity extends ActionBarActivity implements View.OnCli
             mSide2Str = getString(R.string.str_side2);
         }
 
+        final Dialog dialog = new ProgressDialog(this);
+        final Handler handler = new Handler();
+        dialog.show();
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                GamesDb.insertNewGame(NewGameEditActivity.this, mGameNameString, mSide1Str, mSide2Str);
+                final long rowId = GamesDb.insertNewGame(NewGameEditActivity.this, mGameNameString, mSide1Str, mSide2Str);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        GameDetails game = new GameDetails();
+                        game.setGameName(mGameNameString);
+                        game.setSide1(mSide1Str);
+                        game.setSide2(mSide2Str);
+                        game.setRowId(rowId);
+                        launchScorerActivity(game);
+                    }
+                });
             }
         });
-        GameDetails game = new GameDetails();
-        game.setGameName(mGameNameString);
-        game.setSide1(mSide1Str);
-        game.setSide2(mSide2Str);
+
+    }
+
+    private void launchScorerActivity(GameDetails game) {
         Intent intent = new Intent(this, ScoreBoardActivity.class);
         intent.putExtra(Utils.EXTRA_GAME_DETAILS, game);
         startActivity(intent);

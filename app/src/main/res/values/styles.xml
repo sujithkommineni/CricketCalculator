@@ -21,4 +21,9 @@
         <item name = "android:textColor">@android:color/white</item>
     </style>
 
+    <style name="cric_button">
+        <item name="android:background">@drawable/bg_button</item>
+        <item name="android:textColor">@android:color/white</item>
+    </style>
+
 </resources>

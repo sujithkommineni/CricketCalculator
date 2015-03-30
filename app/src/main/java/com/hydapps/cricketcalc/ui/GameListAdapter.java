@@ -26,7 +26,7 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
     private OnEditClickListener mEditClickListener;
 
     public interface OnEditClickListener {
-        public void onEditClick(int position);
+        public void onEditClick(int position, View anchor);
     }
 
     public void setOnEditClickListener(OnEditClickListener listener) {
@@ -75,7 +75,7 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
     @Override
     public void onClick(View v) {
         int position = (Integer) v.getTag();
-        mEditClickListener.onEditClick(position);
+        mEditClickListener.onEditClick(position, v);
     }
 
     static class DefaultViewHolder extends RecyclerView.ViewHolder {

@@ -19,6 +19,7 @@ public class GameDetails implements Parcelable{
     private long mStartTime;
     private String mNote;
     private int mGameSate;
+    private long mId;
 
     public static final int STATE_SIDE1_BATTING = 0;
     public static final int STATE_SIDE2_BATTING = 1;
@@ -142,6 +143,14 @@ public class GameDetails implements Parcelable{
         this.mGameSate = mGameSate;
     }
 
+    public long getRowId() {
+        return mId;
+    }
+
+    public void setRowId(long mId) {
+        this.mId = mId;
+    }
+
     public GameDetails(Parcel pl) {
         mGameName = pl.readString();
         mSide1 = pl.readString();
@@ -155,6 +164,7 @@ public class GameDetails implements Parcelable{
         mStartTime = pl.readLong();
         mNote = pl.readString();
         mGameSate = pl.readInt();
+        mId = pl.readLong();
     }
 
     @Override
@@ -176,6 +186,7 @@ public class GameDetails implements Parcelable{
         dest.writeLong(mStartTime);
         dest.writeString(mNote);
         dest.writeInt(mGameSate);
+        dest.writeLong(mId);
     }
 
     public static final Creator<GameDetails> CREATOR = new Creator<GameDetails>() {

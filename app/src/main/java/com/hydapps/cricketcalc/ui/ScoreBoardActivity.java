@@ -23,6 +23,8 @@ import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.Utils;
 
 public class ScoreBoardActivity extends ActionBarActivity implements View.OnClickListener {
+    private static final int MENU_NEW_GAME = 1;
+    private static final int MENU_EDIT = 2;
     /** Called when the activity is first created. */
 	
 	private final String TAG = "CRICKET_CALC";
@@ -327,30 +329,28 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
-		menu.add("RESET");
-		menu.add("EDIT");
+		menu.add(1, MENU_NEW_GAME, 0, R.string.new_game);
+		menu.add(1, MENU_EDIT, 0, R.string.str_edit);
 		return true;
 	}
 
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
-		if(item.getTitle().equals("RESET")){
-			mBallHolder.removeAllViews();
-			mScore = 0;
-			mBalls = 0;
-			mWickets = 0;
-			updateScore();
-			adjustScroll();
-		}
-		if(item.getTitle().equals("EDIT")){
-			Intent editIntent = new Intent(this, EditGameActivity.class);
-            writeToGameDetails();
-            editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, mGameDetails);
-			startActivityForResult(editIntent, 1);
-		}
-		return true;
+        switch (item.getItemId()) {
+            case MENU_EDIT:
+                Intent editIntent = new Intent(this, EditGameActivity.class);
+                writeToGameDetails();
+                editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, mGameDetails);
+                startActivityForResult(editIntent, 1);
+                return true;
+            case MENU_NEW_GAME:
+                Intent intent = new Intent(this, NewGameEditActivity.class);
+                startActivity(intent);
+                writeToGameDetails();
+                return true;
+        }
+		return false;
 	}
 
     @Override
@@ -399,6 +399,11 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
 		else
 			return super.onKeyDown(keyCode, event);
 	}
-	
-	
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Utils.saveAsync(this, mGameDetails, null);
+    }
 }

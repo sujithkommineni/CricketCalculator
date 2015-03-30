@@ -1,0 +1,6 @@
+configurations.create("default")
+artifacts.add("default", file('play-services-ads-6.5.87.aar'))
+dependencies {
+    apply plugin: 'eclipse'
+    compile 'com.google.android.gms:play-services:6.5.87'
+}

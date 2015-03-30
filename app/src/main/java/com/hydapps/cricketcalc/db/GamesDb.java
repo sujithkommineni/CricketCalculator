@@ -25,7 +25,7 @@ public class GamesDb {
     public static final String NOTE = "note";
 
     private static final String[] PROJECTION = {GAME_NAME, START_TIME, SIDE_1, SIDE_2, SIDE_1_SCORE,
-            SIDE_1_WKTS, SIDE_1_BALLS_PLAYED, SIDE_2_SCORE, SIDE_2_WKTS, SIDE_2_BALLS_PLAYED, MATCH_STATE, NOTE};
+            SIDE_1_WKTS, SIDE_1_BALLS_PLAYED, SIDE_2_SCORE, SIDE_2_WKTS, SIDE_2_BALLS_PLAYED, MATCH_STATE, NOTE, _ID};
 
     private static class DBHelper extends SQLiteOpenHelper {
 
@@ -50,15 +50,16 @@ public class GamesDb {
         }
     }
 
-    public static void insertNewGame(Context context, String gameName, String side1, String side2) {
+    public static long insertNewGame(Context context, String gameName, String side1, String side2) {
         DBHelper helper = new DBHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(GAME_NAME, gameName);
         cv.put(SIDE_1, side1);
         cv.put(SIDE_2, side2);
-        db.insert(TABLE_NAME, null, cv);
+        long rowId = db.insert(TABLE_NAME, null, cv);
         db.close();
+        return rowId;
     }
 
     public static void updateSide(Context context, int side, int rowId, String side_name,
@@ -92,8 +93,28 @@ public class GamesDb {
             game.setBalls2(c.getInt(9));
             game.setGameSate(c.getInt(10));
             game.setNote(c.getString(11));
+            game.setRowId(c.getLong(12));
         }
         if (c != null) c.close();
         return game;
+    }
+
+    public static void updateGameDetails(Context context, GameDetails game) {
+        DBHelper helper = new DBHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(GAME_NAME, game.getGameName());
+        cv.put(SIDE_1, game.getSide1());
+        cv.put(SIDE_2, game.getSide2());
+        cv.put(SIDE_1_SCORE, game.getScore1());
+        cv.put(SIDE_1_BALLS_PLAYED, game.getBalls1());
+        cv.put(SIDE_1_WKTS, game.getWickets1());
+        cv.put(SIDE_2_SCORE, game.getScore2());
+        cv.put(SIDE_2_BALLS_PLAYED, game.getBalls2());
+        cv.put(SIDE_2_WKTS, game.getWickets2());
+        cv.put(MATCH_STATE, game.getGameSate());
+        cv.put(NOTE, game.getNote());
+        db.update(TABLE_NAME, cv, _ID + "=?", new String[]{String.valueOf(game.getRowId())});
+        db.close();
     }
 }

@@ -21,6 +21,7 @@
     <string name="str_result_inprogress">In progress</string>
     <string name="str_result_draw">Draw</string>
 
+
     <string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>
 
     <string-array name="balls_array">
@@ -34,5 +35,8 @@
 
     <string name="menu_save">SAVE</string>
     <string name="menu_cancel">CANCEL</string>
+    <string name="str_edit">Edit</string>
+    <string name="str_share">Share</string>
+    <string name="str_delete">Delete</string>
 
 </resources>

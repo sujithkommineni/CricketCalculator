@@ -1,9 +1,14 @@
 package com.hydapps.cricketcalc.utils;
 
 import android.content.Context;
+import android.os.AsyncTask;
 
 import com.hydapps.cricketcalc.R;
 import com.hydapps.cricketcalc.db.GameDetails;
+import com.hydapps.cricketcalc.db.GamesDb;
+
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 
 /**
  * Created by sujith on 1/1/15.
@@ -25,4 +30,34 @@ public class Utils {
         }
         return ret;
     }
+
+    /**
+     * Should be called from Main Thread. if callback is supplied, onAsyncOperationDone() is called
+     * on the mainthread at the end of this operation.
+     * @param appContext
+     * @param game
+     * @param callback
+     */
+    public static void saveAsync(final Context appContext, final GameDetails game, final OnAsyncOperationDoneCallBack callback) {
+        final android.os.Handler handler = new android.os.Handler();
+        AsyncTask.execute(new Runnable() {
+            @Override
+            public void run() {
+                GamesDb.updateGameDetails(appContext, game);
+                if (callback != null) {
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            callback.onAsyncOperationDone();
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public interface OnAsyncOperationDoneCallBack {
+        void onAsyncOperationDone();
+    }
+
 }

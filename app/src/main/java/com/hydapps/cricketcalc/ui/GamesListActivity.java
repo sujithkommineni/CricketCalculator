@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
+import android.view.View;
 
 import com.hydapps.cricketcalc.R;
 import com.hydapps.cricketcalc.db.GameDetails;
@@ -21,7 +24,7 @@ import java.util.ArrayList;
 /**
  * Created by HRGN76 on 12/22/2014.
  */
-public class GamesListActivity extends Activity implements GameListAdapter.OnEditClickListener{
+public class GamesListActivity extends Activity implements GameListAdapter.OnEditClickListener, PopupMenu.OnMenuItemClickListener {
 
     private ArrayList<GameDetails> mMatchDetailsList;
     private Handler mUpdateHandler;
@@ -81,11 +84,15 @@ public class GamesListActivity extends Activity implements GameListAdapter.OnEdi
     }
 
     @Override
-    public void onEditClick(int position) {
+    public void onEditClick(int position, View anchor) {
         GameDetails game = mMatchDetailsList.get(position);
         Intent editIntent = new Intent(this, EditGameActivity.class);
         editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, game);
         startActivityForResult(editIntent, REQ_EDIT_GAME);
+
+        PopupMenu menu = new PopupMenu(this, anchor);
+        menu.inflate(R.menu.games_list_item_menu);
+        menu.setOnMenuItemClickListener(this);
     }
 
     @Override
@@ -93,6 +100,20 @@ public class GamesListActivity extends Activity implements GameListAdapter.OnEdi
         if (requestCode == REQ_EDIT_GAME && resultCode == RESULT_OK) {
 
         }
+    }
+
+    @Override
+    public boolean onMenuItemClick(MenuItem menuItem) {
+        switch (menuItem.getItemId()) {
+            case R.id.menu_edit:
+                menuItem.
+                return true;
+            case R.id.menu_share:
+                return true;
+            case R.id.menu_delete:
+                return true;
+        }
+        return false;
     }
 
     private class UpdateHandler extends Handler {
