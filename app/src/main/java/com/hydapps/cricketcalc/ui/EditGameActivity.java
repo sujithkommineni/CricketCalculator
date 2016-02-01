@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.hydapps.cricketcalc.R;
+import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.Utils;
 
 import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
@@ -31,15 +32,18 @@ public class EditGameActivity extends ActionBarActivity {
         if (DEBUG) Log.v(LOG_TAG, "onCreate()...");
         setContentView(R.layout.edit_activity_layout);
         if (savedInstanceState == null) {
+            mEditFragment = new EditGameFragment();
             Log.d(LOG_TAG, "adding Fragment");
-            getFragmentManager().beginTransaction().add(R.id.edit_layout_parent, new EditGameFragment(), EDIT_FRAG).commit();
+            getFragmentManager().beginTransaction().add(R.id.edit_layout_parent, mEditFragment, EDIT_FRAG).commit();
+        } else {
+            mEditFragment = (EditGameFragment) getFragmentManager().findFragmentByTag(EDIT_FRAG);
         }
+        mEditFragment.setArguments(getIntent().getExtras());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mEditFragment = (EditGameFragment) getFragmentManager().findFragmentByTag(EDIT_FRAG);
     }
 
     @Override
@@ -65,3 +69,4 @@ public class EditGameActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 }
+

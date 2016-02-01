@@ -18,6 +18,7 @@ import com.hydapps.cricketcalc.utils.DateUtils;
 import com.hydapps.cricketcalc.utils.Utils;
 
 import java.util.Date;
+import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
 
 /**
  * Created by hrgn76 on 12/29/2014.
@@ -29,6 +30,19 @@ public class EditGameFragment extends Fragment {
     private Spinner mSpinnerBalls1, mSpinnerBalls2;
 
     private static final String LOG_TAG = "EditGameFragment";
+    private GameDetails mGameDetails;
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle b = getArguments();
+        if (b != null) {
+            mGameDetails = b.getParcelable(Utils.EXTRA_GAME_DETAILS);
+        }
+        if (mGameDetails == null) {
+            if (DEBUG) Log.e(LOG_TAG, "GameDetails argument is null");
+        }
+    }
 
     @Nullable
     @Override
@@ -57,33 +71,30 @@ public class EditGameFragment extends Fragment {
         mSpinnerBalls1.setAdapter(arrayAdapter1);
         mSpinnerBalls2.setAdapter(arrayAdapter2);
 
-        Bundle b = getArguments();
-        if (b != null) {
-            GameDetails game = b.getParcelable(Utils.EXTRA_GAME_DETAILS);
+        GameDetails game = mGameDetails;
 
-            mEditGameName.setText(game.getGameName());
-            mEditSide1.setText(game.getSide1());
-            mEditSide2.setText(game.getSide2());
-            mEditScore1.setText(game.getScore1());
-            mEditScore2.setText(game.getScore2());
-            mEditWickets1.setText(game.getWickets1());
-            mEditWickets2.setText(game.getWickets2());
-            int balls = game.getBalls1();
-            if (balls > 0) {
-                mEditOvers1.setText(String.valueOf((int) balls/6));
-                mSpinnerBalls1.setSelection((int) balls % 6);
-            } else {
-                mEditOvers1.setText(String.valueOf(0));
-                mSpinnerBalls1.setSelection(0);
-            }
-            balls = game.getBalls2();
-            if (balls > 0) {
-                mEditOvers2.setText(String.valueOf((int) balls/6));
-                mSpinnerBalls2.setSelection((int) balls % 6);
-            } else {
-                mEditOvers2.setText(String.valueOf(0));
-                mSpinnerBalls2.setSelection(0);
-            }
+        mEditGameName.setText(game.getGameName());
+        mEditSide1.setText(game.getSide1());
+        mEditSide2.setText(game.getSide2());
+        mEditScore1.setText(String.valueOf(game.getScore1()));
+        mEditScore2.setText(String.valueOf(game.getScore2()));
+        mEditWickets1.setText(String.valueOf(game.getWickets1()));
+        mEditWickets2.setText(String.valueOf(game.getWickets2()));
+        int balls = game.getBalls1();
+        if (balls > 0) {
+            mEditOvers1.setText(String.valueOf((int) balls/6));
+            mSpinnerBalls1.setSelection((int) balls % 6);
+        } else {
+            mEditOvers1.setText(String.valueOf(0));
+            mSpinnerBalls1.setSelection(0);
+        }
+        balls = game.getBalls2();
+        if (balls > 0) {
+            mEditOvers2.setText(String.valueOf((int) balls/6));
+            mSpinnerBalls2.setSelection((int) balls % 6);
+        } else {
+            mEditOvers2.setText(String.valueOf(0));
+            mSpinnerBalls2.setSelection(0);
         }
         return v;
     }
@@ -134,8 +145,21 @@ public class EditGameFragment extends Fragment {
         balls2 += Integer.parseInt((String) mSpinnerBalls2.getSelectedItem());
 
 
-        GameDetails game = new GameDetails(gameName, side1, side2, score1, score2, balls1, balls2, wickets1, wickets2);
+        GameDetails game = mGameDetails;
+        game.setGameName(gameName);
+        game.setSide1(side1);
+        game.setSide2(side2);
+        game.setBalls1(balls1);
+        game.setBalls2(balls2);
+        game.setWickets1(wickets1);
+        game.setWickets2(wickets2);
         Log.v(LOG_TAG, "getEditedGameDetails: " + game);
         return game;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mGameDetails = getEditedGameDetails();
+        super.onDestroyView();
     }
 }

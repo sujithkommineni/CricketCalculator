@@ -25,6 +25,10 @@ import com.hydapps.cricketcalc.utils.Utils;
 public class ScoreBoardActivity extends ActionBarActivity implements View.OnClickListener {
     private static final int MENU_NEW_GAME = 1;
     private static final int MENU_EDIT = 2;
+    private static final int MENU_BATTING = 3;
+    private static final int MENU_WIN_SIDE1 = 4;
+    private static final int MENU_WIN_SIDE2 = 5;
+    private static final int MENU_DRAW = 6;
     /** Called when the activity is first created. */
 	
 	private final String TAG = "CRICKET_CALC";
@@ -85,6 +89,12 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
         } else if (intent != null) {
             mGameDetails = intent.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
         }
+        if (mGameDetails == null || (mGameDetails.getGameSate() != GameDetails.GameState.SIDE1_BATTING
+                && mGameDetails.getGameSate() != GameDetails.GameState.SIDE2_BATTING)) {
+            Log.e(TAG, "this activity handles games that are in progress!!");
+            finish();
+            return;
+        }
         recoverPreviousState(savedInstanceState);
         updateScore();
     }
@@ -93,11 +103,11 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
     private void recoverPreviousState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
         GameDetails gameDetails = mGameDetails;
-        if (gameDetails.getGameSate() == GameDetails.STATE_SIDE1_BATTING) {
+        if (gameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
             mScore = gameDetails.getScore1();
             mBalls = gameDetails.getBalls1();
             mWickets = gameDetails.getWickets1();
-        } else if (gameDetails.getGameSate() == GameDetails.STATE_SIDE2_BATTING) {
+        } else if (gameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
             mScore = gameDetails.getScore2();
             mBalls = gameDetails.getBalls2();
             mWickets = gameDetails.getWickets2();
@@ -331,6 +341,14 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
 		// TODO Auto-generated method stub
 		menu.add(1, MENU_NEW_GAME, 0, R.string.new_game);
 		menu.add(1, MENU_EDIT, 0, R.string.str_edit);
+        if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
+            menu.add(1, MENU_BATTING, 0, getString(R.string.menu_batting, 2));
+        }/* else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
+            menu.add(1, MENU_BATTING, 0, getString(R.string.menu_batting, 1));
+        }*/
+        menu.add(1, MENU_WIN_SIDE1, 0, getString(R.string.menu_declare_win, 1));
+        menu.add(1, MENU_WIN_SIDE2, 0, getString(R.string.menu_declare_win, 2));
+        menu.add(1, MENU_DRAW, 0, R.string.menu_declare_draw);
 		return true;
 	}
 
@@ -349,6 +367,24 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
                 startActivity(intent);
                 writeToGameDetails();
                 return true;
+            case MENU_BATTING:
+                if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
+                    mGameDetails.setGameSate(GameDetails.GameState.SIDE2_BATTING);
+                }
+                refreshUi();
+                return true;
+            case MENU_DRAW:
+                mGameDetails.setGameSate(GameDetails.GameState.DRAW);
+                refreshUi();
+                return true;
+            case MENU_WIN:
+                if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
+                    mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE1);
+                } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
+                    mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE2);
+                }
+                refreshUi();
+                return true;
         }
 		return false;
 	}
@@ -359,11 +395,11 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
         int new_balls;
         if (resultCode == RESULT_OK) {
             mGameDetails = data.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
-            if (mGameDetails.getGameSate() == GameDetails.STATE_SIDE1_BATTING) {
+            if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
                 mScore = mGameDetails.getScore1();
                 new_balls = mGameDetails.getBalls1();
                 mWickets = mGameDetails.getWickets1();
-            } else if (mGameDetails.getGameSate() == GameDetails.STATE_SIDE2_BATTING) {
+            } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
                 mScore = mGameDetails.getScore2();
                 new_balls = mGameDetails.getBalls2();
                 mWickets = mGameDetails.getWickets2();

@@ -54,7 +54,7 @@ public class NewMatchChooserActivity  extends ActionBarActivity {
             long startTime = mLatestGame.getStartTime();
             long diff = date.getTime() - startTime;
             long hours = TimeUnit.MILLISECONDS.toHours(diff);
-            if (hours < 12 && (mLatestGame.getGameSate() == GameDetails.STATE_SIDE1_BATTING || mLatestGame.getGameSate() == GameDetails.STATE_SIDE2_BATTING)) {
+            if (hours < 12 && (mLatestGame.getGameSate() == GameDetails.GameState.SIDE1_BATTING || mLatestGame.getGameSate() == GameDetails.GameState.SIDE2_BATTING)) {
                 return true;
             }
         }

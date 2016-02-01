@@ -38,5 +38,11 @@
     <string name="str_edit">Edit</string>
     <string name="str_share">Share</string>
     <string name="str_delete">Delete</string>
+    <string name="str_are_you_sure">Are you sure?</string>
+    <string name="delete_conf">do you want to delete the match %s?</string>
+    <string name="menu_batting">side %d batting</string>
+    <string name="menu_declare_win">Declare side %d win</string>
+    <string name="menu_declare_draw">Declare draw</string>
+    <string name="title_activity_scoreboard_display">ScoreboardDisplayActivity</string>
 
 </resources>

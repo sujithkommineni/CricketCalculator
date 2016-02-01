@@ -18,20 +18,22 @@ public class GameDetails implements Parcelable{
     private int mWickets2;
     private long mStartTime;
     private String mNote;
-    private int mGameSate;
+    private GameState mGameSate = GameState.SIDE1_BATTING;
     private long mId;
+    private int mMaxOvers;
 
-    public static final int STATE_SIDE1_BATTING = 0;
+    /*public static final int STATE_SIDE1_BATTING = 0;
     public static final int STATE_SIDE2_BATTING = 1;
 
     public static final int STATE_WIN_SIDE1 = 2;
     public static final int STATE_WIN_SIDE2 = 3;
-    public static final int STATE_DRAW = 4;
+    public static final int STATE_DRAW = 4;*/
 
+    public enum GameState {SIDE1_BATTING, SIDE2_BATTING, WIN_SIDE1, WIN_SIDE2, DRAW};
 
     public GameDetails(String mGameName, String mSide1, String mSide2,
                        int mScore1, int mScore2, int mBalls1, int mBalls2,
-                       int mWickets1, int mWickets2) {
+                       int mWickets1, int mWickets2, long time, String note, GameState gameState, long rowId) {
         this.mGameName = mGameName;
         this.mSide1 = mSide1;
         this.mSide2 = mSide2;
@@ -41,10 +43,26 @@ public class GameDetails implements Parcelable{
         this.mBalls2 = mBalls2;
         this.mWickets1 = mWickets1;
         this.mWickets2 = mWickets2;
+        this.mStartTime = time;
+        this.mNote = note;
+        this.mGameSate = gameState;
+        this.mId = rowId;
     }
 
-    public GameDetails() {
+    public GameDetails() {}
 
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MatchName: ").append(mGameName)
+                .append("side1: ").append(mSide1)
+                .append("score: ").append(mScore1).append('/').append(mWickets1)
+                .append("overs: ").append(mBalls1/6).append('.').append(mBalls1%6)
+                .append("side2: ").append(mSide2)
+                .append("score: ").append(mScore2).append('/').append(mWickets2)
+                .append("overs: ").append(mBalls2/6).append('.').append(mBalls2%6)
+                .append("Result: ").append(mGameSate);
+        return sb.toString();
     }
 
     public String getGameName() {
@@ -135,12 +153,16 @@ public class GameDetails implements Parcelable{
         this.mNote = mNote;
     }
 
-    public int getGameSate() {
+    public GameState getGameSate() {
         return mGameSate;
     }
 
-    public void setGameSate(int mGameSate) {
+    public void setGameSate(GameState mGameSate) {
         this.mGameSate = mGameSate;
+    }
+
+    public void setGameSate(int mGameSate) {
+        this.mGameSate = GameState.values()[mGameSate];
     }
 
     public long getRowId() {
@@ -149,6 +171,14 @@ public class GameDetails implements Parcelable{
 
     public void setRowId(long mId) {
         this.mId = mId;
+    }
+
+    public int getMaxOvers() {
+        return mMaxOvers;
+    }
+
+    public void setMaxOvers(int maxOvers) {
+        this.mMaxOvers = maxOvers;
     }
 
     public GameDetails(Parcel pl) {
@@ -163,8 +193,9 @@ public class GameDetails implements Parcelable{
         mWickets2 = pl.readInt();
         mStartTime = pl.readLong();
         mNote = pl.readString();
-        mGameSate = pl.readInt();
+        mGameSate = GameState.values()[pl.readInt()];
         mId = pl.readLong();
+        mMaxOvers = pl.readInt();
     }
 
     @Override
@@ -185,8 +216,9 @@ public class GameDetails implements Parcelable{
         dest.writeInt(mWickets2);
         dest.writeLong(mStartTime);
         dest.writeString(mNote);
-        dest.writeInt(mGameSate);
+        dest.writeInt(mGameSate.ordinal());
         dest.writeLong(mId);
+        dest.writeInt(mMaxOvers);
     }
 
     public static final Creator<GameDetails> CREATOR = new Creator<GameDetails>() {
@@ -202,9 +234,9 @@ public class GameDetails implements Parcelable{
     };
 
     public void updateBattingTeamScore(int score) {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mScore1 = score;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mScore2 = score;
         } else {
             throw new IllegalStateException("No team is batting");
@@ -212,9 +244,9 @@ public class GameDetails implements Parcelable{
     }
 
     public void updateBattingTeamBallsPlayed(int ballsPlayed) {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mBalls1 = ballsPlayed;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mBalls2 = ballsPlayed;
         } else {
             throw new IllegalStateException("No team is batting");
@@ -222,9 +254,9 @@ public class GameDetails implements Parcelable{
     }
 
     public void updateBattingTeamWickets(int wickets) {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mWickets1 = wickets;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mWickets2 = wickets;
         } else {
             throw new IllegalStateException("No team is batting");
@@ -232,9 +264,9 @@ public class GameDetails implements Parcelable{
     }
 
     public void addRuns(int runsToAdd) {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mScore1 += runsToAdd;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mScore2 += runsToAdd;
         } else {
             throw new IllegalStateException("No team is batting");
@@ -242,9 +274,9 @@ public class GameDetails implements Parcelable{
     }
 
     public void addBall() {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mBalls1++;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mBalls2++;
         } else {
             throw new IllegalStateException("No team is batting");
@@ -252,9 +284,9 @@ public class GameDetails implements Parcelable{
     }
 
     public void addWicket() {
-        if (mGameSate == STATE_SIDE1_BATTING) {
+        if (mGameSate == GameState.SIDE1_BATTING) {
             mWickets1++;
-        }else if (mGameSate == STATE_SIDE2_BATTING) {
+        }else if (mGameSate == GameState.SIDE2_BATTING) {
             mWickets2++;
         } else {
             throw new IllegalStateException("No team is batting");

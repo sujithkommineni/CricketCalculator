@@ -112,9 +112,16 @@ public class GamesDb {
         cv.put(SIDE_2_SCORE, game.getScore2());
         cv.put(SIDE_2_BALLS_PLAYED, game.getBalls2());
         cv.put(SIDE_2_WKTS, game.getWickets2());
-        cv.put(MATCH_STATE, game.getGameSate());
+        cv.put(MATCH_STATE, game.getGameSate().ordinal());
         cv.put(NOTE, game.getNote());
         db.update(TABLE_NAME, cv, _ID + "=?", new String[]{String.valueOf(game.getRowId())});
+        db.close();
+    }
+
+    public static void deleteGame(Context context, GameDetails game) {
+        DBHelper helper = new DBHelper(context);
+        SQLiteDatabase db = helper.getReadableDatabase();
+        db.delete(TABLE_NAME, _ID+"=?", new String[]{String.valueOf(game.getRowId())});
         db.close();
     }
 }

@@ -14,6 +14,7 @@ import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.Utils;
 
 import java.util.List;
+import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
 
 /**
  * Created by hrgn76 on 12/26/2014.
@@ -27,6 +28,7 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
 
     public interface OnEditClickListener {
         public void onEditClick(int position, View anchor);
+        public void onItemClick(int position);
     }
 
     public void setOnEditClickListener(OnEditClickListener listener) {
@@ -65,6 +67,8 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
         viewHoler.mTextGameResult.setText(Utils.getResultString(details, mContext));
         viewHoler.mImageButton.setTag(position);
         viewHoler.mImageButton.setOnClickListener(this);
+        viewHoler.mContainer.setOnClickListener(this);
+        viewHoler.mContainer.setTag(position);
     }
 
     @Override
@@ -74,8 +78,18 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
 
     @Override
     public void onClick(View v) {
-        int position = (Integer) v.getTag();
-        mEditClickListener.onEditClick(position, v);
+        switch (v.getId()) {
+            case R.id.game_item_parent:
+                mEditClickListener.onItemClick((Integer) v.getTag());
+                break;
+
+            default:
+                int position = (Integer) v.getTag();
+                if (DEBUG) Log.v(LOG_TAG, "onClick(): position " + position);
+                mEditClickListener.onEditClick(position, v);
+                break;
+        }
+
     }
 
     static class DefaultViewHolder extends RecyclerView.ViewHolder {
@@ -89,6 +103,8 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
         TextView mTextBalls2;
         TextView mTextGameResult;
         ImageButton mImageButton;
+        View mContainer;
+
 
         public DefaultViewHolder(View itemView) {
             super(itemView);
@@ -101,6 +117,7 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
             mTextBalls2 = (TextView) itemView.findViewById(R.id.tv_item_overs_side2);
             mTextGameResult = (TextView) itemView.findViewById(R.id.tv_item_result);
             mImageButton = (ImageButton) itemView.findViewById(R.id.button_edit);
+            mContainer = itemView.findViewById(R.id.game_item_parent);
         }
     }
  }
