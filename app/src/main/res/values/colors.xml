@@ -1,4 +1,6 @@
 <resources>
-    <color name="color_main">#CC0000</color>
+    <color name="color_main">#cc0000</color>
     <color name="color_secondary">#66ff66</color>
+    <color name="color_bg_main">#9B0000</color>
+    <color name="color_bg_pressed">#E70000</color>
 </resources>

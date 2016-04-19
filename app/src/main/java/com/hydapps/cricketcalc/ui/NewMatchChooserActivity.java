@@ -3,6 +3,7 @@ package com.hydapps.cricketcalc.ui;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.hydapps.cricketcalc.R;
@@ -14,7 +15,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class NewMatchChooserActivity  extends ActionBarActivity {
+public class NewMatchChooserActivity  extends AppCompatActivity {
 
     private GameDetails mLatestGame;
 

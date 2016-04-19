@@ -2,8 +2,10 @@ package com.hydapps.cricketcalc.ui;
 
 import android.content.Intent;
 import android.media.AudioManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -22,7 +24,7 @@ import com.hydapps.cricketcalc.R;
 import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.Utils;
 
-public class ScoreBoardActivity extends ActionBarActivity implements View.OnClickListener {
+public class ScoreBoardActivity extends AppCompatActivity implements View.OnClickListener {
     private static final int MENU_NEW_GAME = 1;
     private static final int MENU_EDIT = 2;
     private static final int MENU_BATTING = 3;
@@ -59,6 +61,8 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
     private int mScore;
     private int mBalls;
     private int mWickets;
+
+    private UiAsyncQueryHandler mAsyncQueryHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -97,23 +101,15 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
         }
         recoverPreviousState(savedInstanceState);
         updateScore();
+        updateTitle();
+        mAsyncQueryHandler = UiAsyncQueryHandler.getInstance();
     }
     
     
     private void recoverPreviousState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
         GameDetails gameDetails = mGameDetails;
-        if (gameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
-            mScore = gameDetails.getScore1();
-            mBalls = gameDetails.getBalls1();
-            mWickets = gameDetails.getWickets1();
-        } else if (gameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
-            mScore = gameDetails.getScore2();
-            mBalls = gameDetails.getBalls2();
-            mWickets = gameDetails.getWickets2();
-        } else {
-            throw new IllegalStateException("no team is batting");
-        }
+        readFromGameDetails(mGameDetails);
         if (savedInstanceState != null) {
             int no_ballViews = savedInstanceState.getInt(NO_OF_BALLS,-1);
             for(int i=1; i<=no_ballViews && no_ballViews != -1; i++){
@@ -335,10 +331,36 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
         mGameDetails.updateBattingTeamWickets(mWickets);
     }
 
+    private void readFromGameDetails(GameDetails gameDetails) {
+        if (gameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
+            mScore = gameDetails.getScore1();
+            mBalls = gameDetails.getBalls1();
+            mWickets = gameDetails.getWickets1();
+        } else if (gameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
+            mScore = gameDetails.getScore2();
+            mBalls = gameDetails.getBalls2();
+            mWickets = gameDetails.getWickets2();
+        } else {
+            throw new IllegalStateException("no team is batting");
+        }
+    }
+
+    private void updateTitle() {
+        if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
+            setTitle(mGameDetails.getSide1());
+        } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
+            setTitle(mGameDetails.getSide2());
+            getSupportActionBar().setSubtitle(String.valueOf(mGameDetails.getScore1()));
+        } else {
+            Log.e(TAG, "updateTitle: wrong game state.");
+        }
+    }
+
 
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onPrepareOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
+        menu.clear();
 		menu.add(1, MENU_NEW_GAME, 0, R.string.new_game);
 		menu.add(1, MENU_EDIT, 0, R.string.str_edit);
         if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
@@ -368,26 +390,44 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
                 writeToGameDetails();
                 return true;
             case MENU_BATTING:
+                writeToGameDetails();
                 if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
                     mGameDetails.setGameSate(GameDetails.GameState.SIDE2_BATTING);
                 }
+                invalidateOptionsMenu();
                 refreshUi();
                 return true;
             case MENU_DRAW:
+                writeToGameDetails();
                 mGameDetails.setGameSate(GameDetails.GameState.DRAW);
                 refreshUi();
                 return true;
-            case MENU_WIN:
-                if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
-                    mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE1);
-                } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
-                    mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE2);
-                }
+            case MENU_WIN_SIDE1:
+                writeToGameDetails();
+                mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE1);
+                refreshUi();
+                return true;
+            case MENU_WIN_SIDE2:
+                writeToGameDetails();
+                mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE2);
                 refreshUi();
                 return true;
         }
 		return false;
 	}
+
+    private void refreshUi() {
+        if (mGameDetails.getGameSate() != GameDetails.GameState.SIDE1_BATTING
+                && mGameDetails.getGameSate() != GameDetails.GameState.SIDE2_BATTING) {
+            Intent gameSummary = new Intent(this, GameSummaryActivity.class);
+            startActivity(gameSummary);
+            finish();
+            return;
+        }
+        readFromGameDetails(mGameDetails);
+        updateScore();
+        updateTitle();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -440,6 +480,7 @@ public class ScoreBoardActivity extends ActionBarActivity implements View.OnClic
     @Override
     protected void onPause() {
         super.onPause();
-        Utils.saveAsync(this, mGameDetails, null);
+        writeToGameDetails();
+        mAsyncQueryHandler.saveAsync(this, mGameDetails);
     }
 }

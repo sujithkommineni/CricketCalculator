@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -30,7 +31,7 @@ import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
 /**
  * Created by HRGN76 on 12/22/2014.
  */
-public class GamesListActivity extends Activity implements GameListAdapter.OnEditClickListener, PopupMenu.OnMenuItemClickListener {
+public class GamesListActivity extends AppCompatActivity implements GameListAdapter.OnEditClickListener, PopupMenu.OnMenuItemClickListener {
 
     private ArrayList<GameDetails> mMatchDetailsList;
     private Handler mUpdateHandler;
@@ -41,6 +42,8 @@ public class GamesListActivity extends Activity implements GameListAdapter.OnEdi
     private static final int REQ_EDIT_GAME = 1;
     private int mPopupMenuPosition;
     private PopupMenu mPopupMenu;
+    UiAsyncQueryHandler mUiAsyncQueryHandler;
+
     private static final String TAG = "GamesListActivity";
 
 
@@ -55,18 +58,18 @@ public class GamesListActivity extends Activity implements GameListAdapter.OnEdi
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnEditClickListener(this);
         mUpdateHandler = new UpdateHandler();
+        mUiAsyncQueryHandler = UiAsyncQueryHandler.getInstance();
         startLoading();
     }
 
 
 
     private void startLoading() {
-        AsyncTask.execute(new Runnable() {
+                mUiAsyncQueryHandler.queryForAllGamesAsync(new UiAsyncQueryHandler.AsyncOperationDoneListener() {
             @Override
-            public void run() {
-                Cursor cursor;
-                cursor = GamesDb.getAllGames(GamesListActivity.this);
+            public void onAsyncOperationDone(Object obj) {
                 mMatchDetailsList.clear();
+                Cursor cursor = (Cursor) obj;
                 if (cursor != null && cursor.moveToFirst()) {
                     do {
                         GameDetails match = new GameDetails();
@@ -91,7 +94,7 @@ public class GamesListActivity extends Activity implements GameListAdapter.OnEdi
                     cursor.close();
                 }
             }
-        });
+        }, this);
     }
 
     @Override

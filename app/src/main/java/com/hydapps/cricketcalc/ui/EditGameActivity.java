@@ -2,7 +2,9 @@ package com.hydapps.cricketcalc.ui;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.view.MenuCompat;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +18,7 @@ import static com.hydapps.cricketcalc.utils.Utils.DEBUG;
 /**
  * Created by sujith on 1/1/15.
  */
-public class EditGameActivity extends ActionBarActivity {
+public class EditGameActivity extends AppCompatActivity {
 
     private static final String EDIT_FRAG = "EDIT_FRAG";
     private static final String LOG_TAG = "EditGameActivity";
@@ -34,9 +36,9 @@ public class EditGameActivity extends ActionBarActivity {
         if (savedInstanceState == null) {
             mEditFragment = new EditGameFragment();
             Log.d(LOG_TAG, "adding Fragment");
-            getFragmentManager().beginTransaction().add(R.id.edit_layout_parent, mEditFragment, EDIT_FRAG).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.edit_layout_parent, mEditFragment, EDIT_FRAG).commit();
         } else {
-            mEditFragment = (EditGameFragment) getFragmentManager().findFragmentByTag(EDIT_FRAG);
+            mEditFragment = (EditGameFragment) getSupportFragmentManager().findFragmentByTag(EDIT_FRAG);
         }
         mEditFragment.setArguments(getIntent().getExtras());
     }
@@ -48,9 +50,19 @@ public class EditGameActivity extends ActionBarActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        menu.add(0, RESULT_SAVE, 0, R.string.menu_save).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
-        menu.add(0, RESULT_CANCEL, 1, R.string.menu_cancel).setShowAsActionFlags(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        MenuItem menuSave = menu.add(0, RESULT_SAVE, 0, R.string.menu_save);
+        MenuItem menuCancel = menu.add(0, RESULT_CANCEL, 1, R.string.menu_cancel);
+        MenuItemCompat me = new MenuItemCompat();
+        me.setShowAsAction(menuSave, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+        me = new MenuItemCompat();
+        me.setShowAsAction(menuCancel, MenuItemCompat.SHOW_AS_ACTION_ALWAYS);
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override

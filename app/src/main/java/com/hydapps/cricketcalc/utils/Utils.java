@@ -32,13 +32,13 @@ public class Utils {
         return ret;
     }
 
-    /**
+/*    *//**
      * Should be called from Main Thread. if callback is supplied, onAsyncOperationDone() is called
      * on the mainthread at the end of this operation.
      * @param appContext
      * @param game
      * @param callback
-     */
+     *//*
     public static void saveAsync(final Context appContext, final GameDetails game, final OnAsyncOperationDoneCallBack callback) {
         final android.os.Handler handler = new android.os.Handler();
         AsyncTask.execute(new Runnable() {
@@ -55,7 +55,7 @@ public class Utils {
                 }
             }
         });
-    }
+    }*/
 
     public static void deleteAsync(final Context context, final GameDetails game) {
         AsyncTask.execute(new Runnable() {

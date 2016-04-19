@@ -2,6 +2,7 @@ package com.hydapps.cricketcalc.ui;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageButton;
@@ -11,7 +12,7 @@ import com.hydapps.cricketcalc.R;
 import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.utils.Utils;
 
-public class ScoreboardDisplayActivity extends ActionBarActivity {
+public class ScoreboardDisplayActivity extends AppCompatActivity {
 
     TextView mTextGameName;
     TextView mTextSide1;
