@@ -60,9 +60,9 @@ public class GameListAdapter extends RecyclerView.Adapter <GameListAdapter.Defau
         viewHoler.mTextSide2.setText(details.getSide2());
         viewHoler.mTextScore1.setText(details.getScore1() + "/" + details.getWickets1());
         viewHoler.mTextScore2.setText(details.getScore2() + "/" + details.getWickets2());
-        String overs = details.getBalls1() / 6 + "." + details.getBalls1() % 6;
+        String overs = Utils.convertToOvers(details.getBalls1());
         viewHoler.mTextBalls1.setText(overs);
-        overs = details.getBalls2() / 6 + "." + details.getBalls2() % 6;
+        overs = Utils.convertToOvers(details.getBalls2());
         viewHoler.mTextBalls2.setText(overs);
         viewHoler.mTextGameResult.setText(Utils.getResultString(details, mContext));
         viewHoler.mImageButton.setTag(position);

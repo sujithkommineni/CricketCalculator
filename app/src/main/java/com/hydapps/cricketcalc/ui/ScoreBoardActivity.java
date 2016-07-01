@@ -58,15 +58,16 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
 	public static final int RESULT_WHAT = 12;
 	public static final int RESULT_RUNS = 13;
 	public static final int RESULT_WICKET = 14;
-    private int mScore;
-    private int mBalls;
-    private int mWickets;
+    private int mBallsTemp;
 
     private UiAsyncQueryHandler mAsyncQueryHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
         setContentView(R.layout.main);
         Window win = getWindow();
         win.setBackgroundDrawableResource(R.drawable.grass_tile_repeat);
@@ -108,8 +109,6 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
     
     private void recoverPreviousState(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
-        GameDetails gameDetails = mGameDetails;
-        readFromGameDetails(mGameDetails);
         if (savedInstanceState != null) {
             int no_ballViews = savedInstanceState.getInt(NO_OF_BALLS,-1);
             for(int i=1; i<=no_ballViews && no_ballViews != -1; i++){
@@ -187,42 +186,42 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
     	
 		case R.id.button_one:
 			process(1,"1", mSameBall);
-			mScore++;
+            mGameDetails.addRuns(1);
 			break;
 			
 		case R.id.button_two:
 			process(2,"2", mSameBall);
-			mScore +=2;
+            mGameDetails.addRuns(2);
 			break;
 			
 		case R.id.button_three:
 			process(3,"3", mSameBall);
-			mScore +=3;
+            mGameDetails.addRuns(3);
 			break;
 
 		case R.id.button_four:
 			process(4,"4", mSameBall);
-			mScore +=4;
+            mGameDetails.addRuns(4);
 			break;
 			
 		case R.id.button_six:
 			process(6,"6", mSameBall);
-			mScore +=6;
+            mGameDetails.addRuns(6);
 			break;
 			
 		case R.id.button_wicket:
 			process(WICKET,getTextForballType(WICKET), mSameBall);
-			mWickets++;
+            mGameDetails.addWickets(1);
 			break;
 			
 		case R.id.button_wide:
 			process(WIDE_BALL, getTextForballType(WIDE_BALL), mSameBall);
-			mScore++;
+            mGameDetails.addRuns(1);
 			break;
 			
 		case R.id.button_nobe:
 			process(NO_BALL, getTextForballType(NO_BALL), mSameBall);
-			mScore++;
+            mGameDetails.addRuns(1);
 			break;
 			
 		default:
@@ -230,10 +229,16 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
 		}
     	
     	if(!mSameBall && v.getId()!=R.id.button_nobe && v.getId()!=R.id.button_wide)
-    		mBalls++;
+    		mGameDetails.addBalls(1);
     	mSameBall = false;
     	mButtonSameBall.setSelected(mSameBall);
     	updateScore();
+        if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
+            if (mGameDetails.getScore2() > mGameDetails.getScore1()) {
+                mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE2);
+                finishAndLaunchSummaryActivity();
+            }
+        }
     }
     
 	//Moves the Scroll to the Right End
@@ -263,18 +268,18 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
     	}
     	int tag = Integer.parseInt(s);
     	if(tag==NO_BALL || tag==WIDE_BALL){
-    		mScore--;
+            mGameDetails.addRuns(-1);
     		return;
     	}
     	if(tag == WICKET){
-    		mWickets--;
+            mGameDetails.addWickets(-1);
     		if(!sameball)
-    			mBalls--;
+    			mGameDetails.addBalls(-1);
     		return;
     	}
-    	mScore -=tag;
+        mGameDetails.addRuns(-tag);
 		if(!sameball)
-			mBalls--;
+            mGameDetails.addBalls(-1);
 	}
 
 
@@ -284,8 +289,8 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
      * While reading those string if there is '+' in the string we wont set mBall background to that view.
      */
     private void process(int result,String text, boolean sameball){
-    	Log.i(TAG, "mBalls: "+ mBalls);
-    	if(mBalls % 6 == 0 && !sameball){
+    	Log.i(TAG, "mBalls: "+ mGameDetails.getBalls());
+    	if(mGameDetails.getBalls() % 6 == 0 && !sameball){
     		mBallHolder.removeAllViews();
     	}
         LayoutInflater inflater = (LayoutInflater)getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -305,8 +310,8 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
     
     //updates the mScore and overs
     private void updateScore(){
-    	mScoreView.setText("" + mScore + "/" + mWickets);
-    	mOversView.setText("" + mBalls / 6 + "." + mBalls % 6);
+    	mScoreView.setText("" + mGameDetails.getScore() + "/" + mGameDetails.getWickets());
+        mOversView.setText(Utils.convertToOvers(mGameDetails.getBalls()));
     }
     
     @Override
@@ -314,7 +319,6 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
 		// TODO Auto-generated method stub
     	Log.i(TAG, "savedinstacestare() called");
     	int no_of_balls = mBallHolder.getChildCount();
-        writeToGameDetails();
         outState.putParcelable(Utils.EXTRA_GAME_DETAILS, mGameDetails);
     	outState.putInt(NO_OF_BALLS, no_of_balls);
     	for(int i=1; i<=no_of_balls; i++){
@@ -325,13 +329,8 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
 		super.onSaveInstanceState(outState);
 	}
 
-    private void writeToGameDetails() {
-        mGameDetails.updateBattingTeamScore(mScore);
-        mGameDetails.updateBattingTeamBallsPlayed(mBalls);
-        mGameDetails.updateBattingTeamWickets(mWickets);
-    }
 
-    private void readFromGameDetails(GameDetails gameDetails) {
+    /*private void readFromGameDetails(GameDetails gameDetails) {
         if (gameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
             mScore = gameDetails.getScore1();
             mBalls = gameDetails.getBalls1();
@@ -343,14 +342,15 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
         } else {
             throw new IllegalStateException("no team is batting");
         }
-    }
+    }*/
 
     private void updateTitle() {
         if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
             setTitle(mGameDetails.getSide1());
         } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
             setTitle(mGameDetails.getSide2());
-            getSupportActionBar().setSubtitle(String.valueOf(mGameDetails.getScore1()));
+            getSupportActionBar().setSubtitle(getString(R.string.str_target)
+                    + " "+String.valueOf(mGameDetails.getScore1()));
         } else {
             Log.e(TAG, "updateTitle: wrong game state.");
         }
@@ -379,38 +379,39 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
 	public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case MENU_EDIT:
+                mBallsTemp = mGameDetails.getBalls();
                 Intent editIntent = new Intent(this, EditGameActivity.class);
-                writeToGameDetails();
                 editIntent.putExtra(Utils.EXTRA_GAME_DETAILS, mGameDetails);
                 startActivityForResult(editIntent, 1);
                 return true;
             case MENU_NEW_GAME:
                 Intent intent = new Intent(this, NewGameEditActivity.class);
+                finish();
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                writeToGameDetails();
                 return true;
-            case MENU_BATTING:
-                writeToGameDetails();
+            case MENU_BATTING://change the batting team to side2
                 if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
                     mGameDetails.setGameSate(GameDetails.GameState.SIDE2_BATTING);
                 }
                 invalidateOptionsMenu();
                 refreshUi();
+                clearBalls();
                 return true;
             case MENU_DRAW:
-                writeToGameDetails();
                 mGameDetails.setGameSate(GameDetails.GameState.DRAW);
-                refreshUi();
+                finishAndLaunchSummaryActivity();
                 return true;
             case MENU_WIN_SIDE1:
-                writeToGameDetails();
                 mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE1);
-                refreshUi();
+                finishAndLaunchSummaryActivity();
                 return true;
             case MENU_WIN_SIDE2:
-                writeToGameDetails();
                 mGameDetails.setGameSate(GameDetails.GameState.WIN_SIDE2);
-                refreshUi();
+                finishAndLaunchSummaryActivity();
+                return true;
+            case android.R.id.home:
+                finish();
                 return true;
         }
 		return false;
@@ -424,7 +425,6 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
             finish();
             return;
         }
-        readFromGameDetails(mGameDetails);
         updateScore();
         updateTitle();
     }
@@ -435,26 +435,20 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
         int new_balls;
         if (resultCode == RESULT_OK) {
             mGameDetails = data.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
-            if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE1_BATTING) {
-                mScore = mGameDetails.getScore1();
-                new_balls = mGameDetails.getBalls1();
-                mWickets = mGameDetails.getWickets1();
-            } else if (mGameDetails.getGameSate() == GameDetails.GameState.SIDE2_BATTING) {
-                mScore = mGameDetails.getScore2();
-                new_balls = mGameDetails.getBalls2();
-                mWickets = mGameDetails.getWickets2();
-            } else {
-                throw new IllegalStateException("no team is batting");
+            if (mGameDetails.getGameSate() != GameDetails.GameState.SIDE1_BATTING
+                    && mGameDetails.getGameSate() != GameDetails.GameState.SIDE2_BATTING) {
+                finishAndLaunchSummaryActivity();
+                return;
             }
+            new_balls = mGameDetails.getBalls();
 
-            if (new_balls != mBalls) {
+            if (new_balls != mBallsTemp) {
                 mBallHolder.removeAllViews();
                 for (int i = 0; i < new_balls % 6; i++) {
                     addRecoveredViews("0");
                 }
                 adjustScroll();
             }
-            mBalls = new_balls;
             updateScore();
         }
     }
@@ -480,7 +474,17 @@ public class ScoreBoardActivity extends AppCompatActivity implements View.OnClic
     @Override
     protected void onPause() {
         super.onPause();
-        writeToGameDetails();
         mAsyncQueryHandler.saveAsync(this, mGameDetails);
+    }
+
+    private void clearBalls() {
+        mBallHolder.removeAllViews();
+    }
+
+    private void finishAndLaunchSummaryActivity() {
+        Intent summaryIntent = new Intent(this, GameSummaryActivity.class);
+        summaryIntent.putExtra(Utils.EXTRA_GAME_DETAILS, mGameDetails);
+        startActivity(summaryIntent);
+        finish();
     }
 }

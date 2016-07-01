@@ -93,16 +93,42 @@ public class GameDetails implements Parcelable{
         return mScore1;
     }
 
-    public void setScore1(int mScore1) {
-        this.mScore1 = mScore1;
+    /**
+     * Returns the batting team score.
+     * @return
+     */
+    public int getScore() {
+        if (mGameSate == GameState.SIDE1_BATTING) {
+            return getScore1();
+        } else if (mGameSate == GameState.SIDE2_BATTING) {
+            return getScore2();
+        } else {
+            throw new IllegalStateException("NO team is batting.");
+        }
+    }
+
+    public void setScore1(int score1) {
+        if (score1 > 99999) score1 = 99999;
+        mScore1 = score1;
     }
 
     public int getScore2() {
         return mScore2;
     }
 
-    public void setScore2(int mScore2) {
-        this.mScore2 = mScore2;
+    public void setScore2(int score2) {
+        if (score2 > 99999) score2 = 99999;
+        mScore2 = score2;
+    }
+
+    public int getBalls() {
+        if (mGameSate == GameState.SIDE1_BATTING) {
+            return getBalls1();
+        } else if (mGameSate == GameState.SIDE2_BATTING) {
+            return getBalls2();
+        } else {
+            throw new IllegalStateException("No team is batting.");
+        }
     }
 
     public int getBalls1() {
@@ -119,6 +145,16 @@ public class GameDetails implements Parcelable{
 
     public void setBalls2(int mBalls2) {
         this.mBalls2 = mBalls2;
+    }
+
+    public int getWickets() {
+        if (mGameSate == GameState.SIDE1_BATTING) {
+            return getWickets1();
+        } else if (mGameSate == GameState.SIDE2_BATTING) {
+            return getWickets2();
+        } else {
+            throw new IllegalStateException("No team is batting.");
+        }
     }
 
     public int getWickets1() {
@@ -264,30 +300,33 @@ public class GameDetails implements Parcelable{
     }
 
     public void addRuns(int runsToAdd) {
+        int tempScore = 0;
         if (mGameSate == GameState.SIDE1_BATTING) {
-            mScore1 += runsToAdd;
+            tempScore = mScore1 + runsToAdd;
+            mScore1 = tempScore > 99999 ? 99999 : tempScore;
         }else if (mGameSate == GameState.SIDE2_BATTING) {
-            mScore2 += runsToAdd;
+            tempScore = mScore2 + runsToAdd;
+            mScore2 = tempScore > 99999 ? 99999 : tempScore;
         } else {
             throw new IllegalStateException("No team is batting");
         }
     }
 
-    public void addBall() {
+    public void addBalls(int balls) {
         if (mGameSate == GameState.SIDE1_BATTING) {
-            mBalls1++;
+            mBalls1 += balls;
         }else if (mGameSate == GameState.SIDE2_BATTING) {
-            mBalls2++;
+            mBalls2 += balls;
         } else {
             throw new IllegalStateException("No team is batting");
         }
     }
 
-    public void addWicket() {
+    public void addWickets(int wickets) {
         if (mGameSate == GameState.SIDE1_BATTING) {
-            mWickets1++;
+            mWickets1 += wickets;
         }else if (mGameSate == GameState.SIDE2_BATTING) {
-            mWickets2++;
+            mWickets2 += wickets;
         } else {
             throw new IllegalStateException("No team is batting");
         }

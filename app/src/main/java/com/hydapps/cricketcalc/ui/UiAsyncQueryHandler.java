@@ -92,13 +92,13 @@ public class UiAsyncQueryHandler implements Runnable {
         });
     }
 
-    public void insertAsync(final String game, final String side1, final String side2, final AppCompatActivity activity,
+    public void insertAsync(final String game, final String side1, final String side2, final long startTime, final AppCompatActivity activity,
                                       final AsyncOperationDoneListener doneListener) {
         mDialogFragment.show(activity.getSupportFragmentManager(), DIALOG_TAG);
         mWorkerThread.post(new Runnable() {
             @Override
             public void run() {
-                final long rowId = GamesDb.insertNewGame(activity, game, side1, side2);
+                final long rowId = GamesDb.insertNewGame(activity, game, side1, side2, startTime);
                 if (doneListener != null) {
                     activity.runOnUiThread(new Runnable() {
                         @Override

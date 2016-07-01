@@ -50,13 +50,14 @@ public class GamesDb {
         }
     }
 
-    public static long insertNewGame(Context context, String gameName, String side1, String side2) {
+    public static long insertNewGame(Context context, String gameName, String side1, String side2, long startTime) {
         DBHelper helper = new DBHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(GAME_NAME, gameName);
         cv.put(SIDE_1, side1);
         cv.put(SIDE_2, side2);
+        cv.put(START_TIME, startTime);
         long rowId = db.insert(TABLE_NAME, null, cv);
         db.close();
         return rowId;
@@ -70,14 +71,14 @@ public class GamesDb {
     public static Cursor getAllGames(Context context) {
         DBHelper helper = new DBHelper(context);
         SQLiteDatabase db = helper.getWritableDatabase();
-        Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME);
+        Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME + " DESC");
         return c;
     }
 
     public static GameDetails getLatestGame(Context context) {
         DBHelper helper = new DBHelper(context);
         SQLiteDatabase db = helper.getReadableDatabase();
-        Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME, String.valueOf(1));
+        Cursor c = db.query(TABLE_NAME, PROJECTION, null, null, null, null, START_TIME + " DESC", String.valueOf(1));
         GameDetails game = null;
         if (c != null && c.moveToFirst()) {
             game = new GameDetails();

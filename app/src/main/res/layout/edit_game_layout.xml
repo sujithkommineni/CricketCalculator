@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/edit_game_name"
+        android:maxLength="25"
         android:layout_marginTop="3dp"/>
 
     <Space
@@ -45,6 +46,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_name"
             android:id="@+id/tv_name"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"/>
 
         <EditText
@@ -54,6 +56,7 @@
             android:layout_marginLeft="3dp"
             android:layout_alignParentRight="true"
             android:singleLine="true"
+            android:maxLength="25"
             android:layout_toRightOf="@id/tv_name" />
     </RelativeLayout>
     <RelativeLayout
@@ -65,6 +68,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_score"
             android:id="@+id/tv_edit_score1"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
             />
         <EditText
@@ -74,6 +78,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="3dp"
             android:inputType="number"
+            android:maxLength="5"
             android:id="@+id/edit_score1"
             android:singleLine="true"/>
     </RelativeLayout>
@@ -87,6 +92,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_overs"
             android:id="@+id/tv_edit_overs1"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
             />
         <EditText
@@ -96,11 +102,12 @@
             android:layout_marginLeft="3dp"
             android:singleLine="true"
             android:maxEms="3"
+            android:maxLength="4"
             android:inputType="number"
             android:id="@+id/edit_overs1"
             />
         <Spinner
-            android:layout_width="50dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/edit_overs1"
             android:layout_centerVertical="true"
@@ -118,6 +125,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_edit_wkts1"
             android:text="@string/str_wickets"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"/>
         <EditText
             android:layout_width="60dp"
@@ -127,6 +135,7 @@
             android:id="@+id/edit_wkts1"
             android:singleLine="true"
             android:inputType="number"
+            android:maxLength="3"
             android:layout_toRightOf="@id/tv_edit_wkts1"/>
         </RelativeLayout>
 
@@ -155,6 +164,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_name"
             android:id="@+id/tv_name1"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"/>
 
         <EditText
@@ -164,6 +174,7 @@
             android:layout_marginLeft="3dp"
             android:layout_alignParentRight="true"
             android:singleLine="true"
+            android:maxLength="25"
             android:layout_toRightOf="@id/tv_name1" />
     </RelativeLayout>
     <RelativeLayout
@@ -175,6 +186,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_score"
             android:id="@+id/tv_edit_score2"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
             />
         <EditText
@@ -184,6 +196,7 @@
             android:layout_alignParentRight="true"
             android:layout_marginLeft="3dp"
             android:inputType="number"
+            android:maxLength="5"
             android:id="@+id/edit_score2"
             android:singleLine="true"/>
     </RelativeLayout>
@@ -197,6 +210,7 @@
             android:layout_height="wrap_content"
             android:text="@string/str_overs"
             android:id="@+id/tv_edit_overs2"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"
             />
         <EditText
@@ -207,10 +221,11 @@
             android:singleLine="true"
             android:maxEms="3"
             android:inputType="number"
+            android:maxLength="4"
             android:id="@+id/edit_overs2"
             />
         <Spinner
-            android:layout_width="50dp"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/edit_overs2"
             android:layout_centerVertical="true"
@@ -228,6 +243,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/tv_edit_wkts2"
             android:text="@string/str_wickets"
+            android:layout_marginRight="20dp"
             android:layout_centerVertical="true"/>
         <EditText
             android:layout_width="60dp"
@@ -236,8 +252,27 @@
             android:layout_marginLeft="3dp"
             android:id="@+id/edit_wkts2"
             android:singleLine="true"
+            android:maxLength="3"
             android:inputType="number"
             android:layout_toRightOf="@id/tv_edit_wkts2"/>
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/state"
+            android:layout_marginRight="20dp"
+            android:id="@+id/tv_state"/>
+        <Spinner
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/tv_state"
+            android:id="@+id/spinner_state">
+        </Spinner>
     </RelativeLayout>
 
 </LinearLayout>

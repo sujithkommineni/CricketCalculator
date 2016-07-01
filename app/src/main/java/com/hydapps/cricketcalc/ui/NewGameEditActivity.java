@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -34,16 +35,20 @@ public class NewGameEditActivity extends AppCompatActivity implements View.OnCli
 
     private String mGameNameString, mSide1Str, mSide2Str;
 
+    private long mStartTime;
+
     private UiAsyncQueryHandler mAsyncHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.new_game_edit_layout);
         mEditGameName = (EditText) findViewById(R.id.edit_game_name);
         mEditSide1 = (EditText) findViewById(R.id.edit_side1);
         mEditSide2 = (EditText) findViewById(R.id.edit_side2);
-        mGameNameString = getString(R.string.str_game_prefix) + DateUtils.getDateTimeString(new Date().getTime());
+        mStartTime = new Date().getTime();
+        mGameNameString = getString(R.string.str_game_prefix) + "_" + DateUtils.getDateTimeString(mStartTime);
         mEditGameName.setText(mGameNameString);
         mEditSide1.setText(R.string.str_side1);
         mEditSide2.setText(R.string.str_side2);
@@ -69,7 +74,7 @@ public class NewGameEditActivity extends AppCompatActivity implements View.OnCli
             mSide2Str = getString(R.string.str_side2);
         }
 
-        mAsyncHandler.insertAsync(mGameNameString, mSide1Str, mSide2Str, this,
+        mAsyncHandler.insertAsync(mGameNameString, mSide1Str, mSide2Str, mStartTime,  this,
                 new UiAsyncQueryHandler.AsyncOperationDoneListener() {
                     @Override
                     public void onAsyncOperationDone(Object obj) {
@@ -87,9 +92,24 @@ public class NewGameEditActivity extends AppCompatActivity implements View.OnCli
 
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
     private void launchScorerActivity(GameDetails game) {
         Intent intent = new Intent(this, ScoreBoardActivity.class);
         intent.putExtra(Utils.EXTRA_GAME_DETAILS, game);
         startActivity(intent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        finish();
     }
 }

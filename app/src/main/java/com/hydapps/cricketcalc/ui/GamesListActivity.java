@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -51,18 +52,23 @@ public class GamesListActivity extends AppCompatActivity implements GameListAdap
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mMatchDetailsList = new ArrayList<>();
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         setContentView(R.layout.games_list_layout);
         mRecyclerView = (RecyclerView) findViewById(R.id.recycler_gamelist);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerView.addItemDecoration(new VerticalSpaceItemDecoration(10));
         mAdapter = new GameListAdapter(null, this);
         mRecyclerView.setAdapter(mAdapter);
         mAdapter.setOnEditClickListener(this);
         mUpdateHandler = new UpdateHandler();
         mUiAsyncQueryHandler = UiAsyncQueryHandler.getInstance();
-        startLoading();
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        startLoading();
+    }
 
     private void startLoading() {
                 mUiAsyncQueryHandler.queryForAllGamesAsync(new UiAsyncQueryHandler.AsyncOperationDoneListener() {
@@ -85,6 +91,7 @@ public class GamesListActivity extends AppCompatActivity implements GameListAdap
                         match.setBalls2(cursor.getInt(9));
                         match.setGameSate(cursor.getInt(10));
                         match.setNote(cursor.getString(11));
+                        match.setRowId(cursor.getLong(12));
                         mMatchDetailsList.add(match);
                     } while(cursor.moveToNext());
                 }
@@ -119,6 +126,15 @@ public class GamesListActivity extends AppCompatActivity implements GameListAdap
             GameDetails game = data.getParcelableExtra(Utils.EXTRA_GAME_DETAILS);
             updateItem(game);
         }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == android.R.id.home) {
+            finish();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -177,6 +193,18 @@ public class GamesListActivity extends AppCompatActivity implements GameListAdap
         }
     }
 
+    private static class VerticalSpaceItemDecoration extends RecyclerView.ItemDecoration {
+        int mVerticalGap;
+        public VerticalSpaceItemDecoration(int verticalGap) {
+            mVerticalGap = verticalGap;
+        }
+
+        @Override
+        public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+            super.getItemOffsets(outRect, view, parent, state);
+            outRect.bottom = mVerticalGap;
+        }
+    }
 
 
 }

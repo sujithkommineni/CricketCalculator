@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.google.android.gms.ads.MobileAds;
 import com.hydapps.cricketcalc.R;
 import com.hydapps.cricketcalc.db.GameDetails;
 import com.hydapps.cricketcalc.db.GamesDb;
@@ -23,11 +24,21 @@ public class NewMatchChooserActivity  extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        MobileAds.initialize(getApplicationContext(), "ca-app-pub-8413693216965428~1065316742");
         setContentView(R.layout.activity_new_match_chooser);
         mLatestGame = GamesDb.getLatestGame(this);
         View button_continue = findViewById(R.id.button_continue);
         if (!isResumeGameNeeded()) {
             button_continue.setVisibility(View.GONE);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Utils.appLaunched(this);
+        if (Utils.needToShowReviewDialog(this)) {
+            new FeedbackDialogFragment().show(getSupportFragmentManager(), "feedback_dialog");
         }
     }
 
