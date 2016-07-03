@@ -33,8 +33,7 @@
     <string name="str_never">Never</string>
 
 
-    <!--<string name="banner_ad_unit_id">ca-app-pub-3940256099942544/6300978111</string>-->
-    <string name="banner_ad_unit_id">ca-app-pub-8413693216965428/2542049942</string>
+    <string name="banner_ad_unit_id">ca-app-pub- xxxxxxxxxxxxxxxxxxxxxxxx</string>
 
     <string-array name="balls_array">
         <item>0</item>
